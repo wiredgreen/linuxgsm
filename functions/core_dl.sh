@@ -33,7 +33,7 @@ if [ -n "${dl_md5}" ]; then
 fi	
 }
 
-fn_dl(){
+fn_dl_file(){
 # defines variables from other script file
 dl_filename=$1
 dl_filepath=$2
@@ -65,7 +65,23 @@ else
 	done
 fi	
 
-
 fn_dl_md5
 }
 
+fn_dl_cfg(){
+# defines variables from other script file
+dl_filename=$1
+dl_filepath=$2
+dl_url=$3
+dl_md5=$4
+dl=$(curl --fail -o "${dl_filepath}/${dl_filename}" "${dl_url}")
+exitcode=$?
+echo -ne "downloading ${dl_filename}...\c"
+if [ ${exitcode} -ne 0 ]; then
+	fn_printfaileol
+	echo -e "${dl_url}\n"
+	exit ${exitcode}
+else
+	fn_printokeol
+fi
+}

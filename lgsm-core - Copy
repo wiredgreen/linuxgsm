@@ -1,0 +1,207 @@
+#!/bin/bash
+# Insurgency
+# Server Management Script
+# Author: Daniel Gibbs
+# Website: http://gameservermanagers.com
+#
+# Modified by Jared Ballou <insurgency@jballou.com>
+# https://github.com/jaredballou/linuxgsm
+
+# Version of script
+version="300116"
+
+# Filename of the core script for installation
+core_script="lgsm-core"
+
+# TODO: Add .lgsm.conf support to pre-load LGSM settings in the event of non-standard installations
+
+# Determine if we are running from a script file, or being piped into bash via curl
+if [ "${BASH_SOURCE[0]}" != "" ]; then
+	# The name of this script file, used to show the LGSM link properly
+	scriptpath=$(readlink -f "${BASH_SOURCE[0]}")
+	# The basename of the real script file
+	selfname=$(basename "${scriptpath}")
+	# Name of this service (will return symlink name for multiple instance support)
+	servicename="$(basename $0)"
+	# Script root directory
+	rootdir="$(dirname "${scriptpath}")"
+else
+	scriptpath="$(pwd)/${core_script}"
+	selfname="${core_script}"
+	servicename="${core_script}"
+	rootdir="$(pwd)"
+fi
+
+# File fetching settings
+# Github Branch Select
+# Allows for the use of different function files
+# from a different repo and/or branch.
+githubuser="jaredballou"
+githubrepo="linuxgsm"
+githubbranch="master"
+
+# Update stale files on the fly using Git.
+git_update=0
+
+# Directories
+
+# LGSM Support Files - set ro rootdir for old behavior
+lgsmdir="${rootdir}/lgsm"
+# Temporary path to store and manipulate settings
+settingsdir="${lgsmdir}/settings.tmp"
+# Supported Game Data
+gamedatadir="${lgsmdir}/gamedata"
+# Config path for local instances
+scriptcfgdir="${lgsmdir}/cfg/servers"
+# Temporary cache location
+cachedir="${lgsmdir}/tmp"
+
+# Create all the directories we need
+for dir in $(set -o posix; set | grep '^[a-zA-Z0-9]*dir=' $0 | cut -d'=' -f1); do
+	if [ ! -e "${!dir}" ]; then
+		echo "Creating ${dir} at ${!dir}"
+		mkdir -p "${!dir}"
+	fi
+done
+
+# Debugging, if debugflag exists send output to $debuglog
+debugflag="${lgsmdir}/.dev-debug"
+debuglog="${lgsmdir}/dev-debug.log"
+if [ -f "${debugflag}" ]; then
+	exec 5>${debuglog}
+	BASH_XTRACEFD="5"
+	set -x
+fi
+
+# Git last commit file (for tracking updates)
+lastcommit_file="${cachedir}/lastcommit"
+
+
+#ipaddr=$(ip addr show $(ip route | grep '^default' | awk '{print $NF}') | grep 'inet ' | awk '{print $2}' | cut -f1  -d'/')
+
+##### Script #####
+# Do not edit
+
+# fn_colortext color msg
+# Display a message with a color code
+# Paremeters:
+# color: Numeric color code
+# msg: Message. This includes all further paremeters, so there is no need to quote a message with spaces in it.
+fn_colortext(){
+#Black        0;30     Dark Gray     1;30
+#Red          0;31     Light Red     1;31
+#Green        0;32     Light Green   1;32
+#Brown/Orange 0;33     Yellow        1;33
+#Blue         0;34     Light Blue    1;34
+#Purple       0;35     Light Purple  1;35
+#Cyan         0;36     Light Cyan    1;36
+#Light Gray   0;37     White         1;37
+	case "${1}" in
+		green)
+			color="\033[0;32m";;
+		yellow)
+			color="\033[0;33m";;
+		reset)
+			color="\033[0m";;
+		red)
+			color="\033[0;31m";;
+		*)
+			color="\033[0;${1}m";;
+	esac
+	echo -e "[${color}${@:2}\e[0m]"
+}
+
+# Set fetchcmd to the full path of whatever command we can to fetch files
+for fetchcmd in curl wget
+do
+	paths="$(command -v ${fetchcmd} 2>/dev/null) $(which ${fetchcmd} >/dev/null 2>&1) /usr/bin/${fetchcmd} /bin/${fetchcmd} /usr/sbin/${fetchcmd} /sbin/${fetchcmd} $(echo $PATH | sed "s/\([:]\|\$\)/\/${fetchcmd} /g")"
+	for tp in $paths
+	do
+		if [ -x $tp ]; then
+			fetchcmd=$tp
+			break 2
+		fi
+	done
+done
+# If we have no executable fetchcmd, fail script execution
+if [ ! -x "${fetchcmd}" ]; then
+	fn_colortext 31 FAIL
+	echo "Cannot find curl or wget!"
+	exit 1
+fi
+
+# fn_getgithubfile filename [exec] [url]
+# Download file from Github
+# Parameters:
+# filename: The path of the file in reference to the repository root
+# exec: Optional, set to 1 to make file executable
+# url: Optional, set to full path under repository root if different than filename
+fn_get_file(){
+	fileurl="${1}"
+	filepath="${2}"
+	exec=${3:-0}
+	force=${4:-0}
+	# If the function file is missing, then download
+	if [ ! -f "${filepath}" ] || [ "${force}" == "1" ] || [ "${force}" == "yes" ]; then
+		filedir=$(dirname "${filepath}")
+		if [ ! -d "${filedir}" ]; then
+			mkdir -p "${filedir}"
+		fi
+		echo -ne "    fetching ${filename} (${fileurl})... "
+		if [ "$(basename ${fetchcmd})" == "curl" ]; then
+			cmd="$fetchcmd -s --fail -o"
+		elif [ "$(basename ${fetchcmd})" == "wget" ]; then
+			cmd="$fetchcmd -O"
+		fi
+		fetch=$($cmd "${filepath}" "${fileurl}" 2>&1)
+		if [ "${exec}" == "run" ] || [ "${exec}" == "exec" ] || [ "${exec}" == "1" ] || [ "${exec}" != "noexec" ] || [ "${exec}" != "norun" ]; then
+			chmod +x "${filepath}"
+		fi
+		fn_colortext 32 "DONE"
+	fi
+	if [ "${exec}" == "run" ] || [ "${exec}" == "exec" ] || [ "${exec}" == "1" ]; then
+		source "${filepath}"
+	fi
+}
+fn_getgithubfile(){
+	filename=$1
+	exec=${2:-0}
+	fileurl=${3:-$filename}
+	force=${4:-0}
+	if [[ $filename = /* ]]; then
+		filepath="${filename}"
+	else
+		filepath="${lgsmdir}/${filename}"
+	fi
+	githuburl="https://raw.githubusercontent.com/${githubuser}/${githubrepo}/${githubbranch}/${fileurl}"
+	fn_get_file "${githuburl}" "${filepath}" "${exec}" "${force}"
+}
+
+# fn_runfunction
+fn_runfunction(){
+	scriptfile=${1:-$functionfile}
+	functionfile=$scriptfile
+	fn_getgithubfile "functions/${functionfile}" run
+	fn_check_github_files "${lgsmdir}" "${lgsmdir}/functions/${functionfile}"
+}
+
+# Load GitHub hashing and updating functions
+fn_runfunction github_hash.sh
+
+# Install gsquery.py
+fn_getgithubfile "gsquery.py" norun "GameServerQuery/gsquery.py"
+
+# Load core functions
+fn_runfunction core_functions.sh
+
+if [ "${selfname}" == "${core_script}" ];
+then
+	fn_runfunction install_lgsm.sh
+else
+	# Process game configs and load variables needed to run script
+	fn_runfunction game_settings.sh
+
+	# Get option from command line and run option parser
+	getopt=$1
+	core_getopt.sh
+fi
