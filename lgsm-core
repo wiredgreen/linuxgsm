@@ -7,6 +7,15 @@
 # Modified by Jared Ballou <insurgency@jballou.com>
 # https://github.com/jaredballou/linuxgsm
 
+# Debugging, if debugflag exists send output to $debuglog
+debugflag=".dev-debug"
+debuglog="dev-debug.log"
+if [ -f "${debugflag}" ]; then
+	exec 5>"${debuglog}"
+	BASH_XTRACEFD="5"
+	set -x
+fi
+
 # Version of script
 version="300116"
 
@@ -36,9 +45,9 @@ fi
 # Github Branch Select
 # Allows for the use of different function files
 # from a different repo and/or branch.
-githubuser="jaredballou"
+githubuser="dgibbs64"
 githubrepo="linuxgsm"
-githubbranch="master"
+githubbranch="dev"
 
 # Update stale files on the fly using Git.
 git_update=0
@@ -64,56 +73,33 @@ for dir in $(set -o posix; set | grep '^[a-zA-Z0-9]*dir=' $0 | cut -d'=' -f1); d
 	fi
 done
 
-# Debugging, if debugflag exists send output to $debuglog
-debugflag="${lgsmdir}/.dev-debug"
-debuglog="${lgsmdir}/dev-debug.log"
-if [ -f "${debugflag}" ]; then
-	exec 5>"${debuglog}"
-	BASH_XTRACEFD="5"
-	set -x
-fi
-
 # Git last commit file (for tracking updates)
 lastcommit_file="${cachedir}/lastcommit"
 
 ##### Script #####
 # Do not edit
 
-fn_getgithubfile(){
-filename=$1
-exec=$2
+fn_loadfunction(){
+# Only used for downloading core functions. Downloading is passed to core_dl.sh
+filename="functions/${functionfile}"
 fileurl=${3:-$filename}
-filepath="${rootdir}/${filename}"
-filedir=$(dirname "${filepath}")
+filepath="${lgsmdir}/${filename}"
 # If the function file is missing, then download
 if [ ! -f "${filepath}" ]; then
+	filedir=$(dirname "${filepath}")
 	if [ ! -d "${filedir}" ]; then
 		mkdir "${filedir}"
 	fi
-	if [ ${filename} = /* ]; then
-		filepath="${filename}"
-	else
-		filepath="${lgsmdir}/${filename}"
-	fi
 	githuburl="https://raw.githubusercontent.com/${githubuser}/${githubrepo}/${githubbranch}/${fileurl}"
 	echo -e "    fetching ${filename}...\c"
-
-	fetchcmd=curl
-	paths="$(command -v ${fetchcmd} 2>/dev/null) $(which ${fetchcmd} >/dev/null 2>&1) /usr/bin/${fetchcmd} /bin/${fetchcmd} /usr/sbin/${fetchcmd} /sbin/${fetchcmd} $(echo $PATH | sed "s/\([:]\|\$\)/\/${fetchcmd} /g")"
-	for tp in $paths
-	do
-		if [ -x $tp ]; then
-			fetchcmd=$tp
-			break 2
-		fi
-	done
-	# If we have no executable fetchcmd, fail script execution
-	if [ ! -x "${fetchcmd}" ]; then
+	if [ "$(command -v curl)" ]||[ "$(which curl >/dev/null 2>&1)" ]||[ -f "/usr/bin/curl" ]||[ -f "/bin/curl" ]; then
+		:
+	else	
 		echo -e "\e[0;31mFAIL\e[0m\n"
 		echo -en "Curl is not installed!"
-		exit 1
+		exit
 	fi
-	curl=$(${fetchcmd} --fail -o "${filepath}" "${githuburl}" 2>&1)
+	curl=$(curl --fail -o "${filepath}" "${githuburl}" 2>&1)
 	if [ $? -ne 0 ]; then
 		echo -e "\e[0;31mFAIL\e[0m\n"
 		echo "${curl}"
@@ -127,23 +113,13 @@ fi
 source "${filepath}"
 }
 
-# fn_loadfn
-fn_loadfn(){
-	scriptfile=${1:-$functionfile}
-	functionfile=${scriptfile}
-	echo "$functionfile"
-	fn_getgithubfile "functions/${functionfile}" run
-	fn_check_github_files "${lgsmdir}" "${lgsmdir}/functions/${functionfile}"
+core_functions.sh(){
+# Functions are defined in core_functions.sh.
+functionfile="${FUNCNAME}"
+fn_loadfunction
 }
 
-if [ "${selfname}" == "${core_script}" ];
-then
-	fn_loadfn install_lgsm.sh
-else
-	# Process game configs and load variables needed to run script
-	fn_loadfn game_settings.sh
+core_functions.sh
 
-	# Get option from command line and run option parser
-	getopt=$1
-	core_getopt.sh
-fi
+getopt=$1
+core_getopt.sh

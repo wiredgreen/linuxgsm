@@ -68,20 +68,35 @@ fi
 fn_dl_md5
 }
 
-fn_dl_cfg(){
-# defines variables from other script file
-dl_filename=$1
-dl_filepath=$2
-dl_url=$3
-dl_md5=$4
-dl=$(curl --fail -o "${dl_filepath}/${dl_filename}" "${dl_url}")
-exitcode=$?
-echo -ne "downloading ${dl_filename}...\c"
-if [ ${exitcode} -ne 0 ]; then
-	fn_printfaileol
-	echo -e "${dl_url}\n"
-	exit ${exitcode}
-else
-	fn_printokeol
+fn_dl_loadfunction(){
+filename="functions/${functionfile}"
+fileurl=${3:-$filename}
+filepath="${lgsmdir}/${filename}"
+# If the function file is missing, then download
+if [ ! -f "${filepath}" ]; then
+	filedir=$(dirname "${filepath}")
+	if [ ! -d "${filedir}" ]; then
+		mkdir "${filedir}"
+	fi
+	githuburl="https://raw.githubusercontent.com/${githubuser}/${githubrepo}/${githubbranch}/${fileurl}"
+	echo -e "    fetching ${filename}...\c"
+	if [ "$(command -v curl)" ]||[ "$(which curl >/dev/null 2>&1)" ]||[ -f "/usr/bin/curl" ]||[ -f "/bin/curl" ]; then
+		:
+	else	
+		echo -e "\e[0;31mFAIL\e[0m\n"
+		echo -en "Curl is not installed!"
+		exit
+	fi
+	curl=$(curl --fail -o "${filepath}" "${githuburl}" 2>&1)
+	if [ $? -ne 0 ]; then
+		echo -e "\e[0;31mFAIL\e[0m\n"
+		echo "${curl}"
+		echo -e "${githuburl}\n"
+		exit
+	else
+		echo -e "\e[0;32mOK\e[0m"
+	fi	
+	chmod +x "${filepath}"
 fi
+source "${filepath}"
 }
