@@ -9,7 +9,7 @@ lgsm_version="070116"
 fn_getopt_generic(){
 case "$getopt" in
 	st|start)
-		command_start.sh;;
+		fn_loadfn command_start.sh;;
 	sp|stop)
 		command_stop.sh;;
 	r|restart)
@@ -20,7 +20,7 @@ case "$getopt" in
 		forceupdate=1;
 		update_check.sh;;
 	uf|update-functions)
-		update_functions.sh;;
+		fn_loadfn update_functions.sh;;
 	v|validate)
 		command_validate.sh;;
 	m|monitor)
@@ -73,7 +73,7 @@ exit
 fn_getopt_teamspeak3(){
 case "$getopt" in
 	st|start)
-		command_start.sh;;
+		fn_loadfn command_start.sh;;
 	sp|stop)
 		command_stop.sh;;
 	r|restart)
@@ -81,7 +81,7 @@ case "$getopt" in
 	u|update)
 		update_check.sh;;
 	uf|update-functions)
-		update_functions.sh;;
+		fn_loadfn update_functions.sh;;
 	m|monitor)
 		command_monitor.sh;;
 	et|email-test)
@@ -127,13 +127,13 @@ exit
 fn_getopt_mumble(){
 case "$getopt" in
 	st|start)
-		command_start.sh;;
+		fn_loadfn command_start.sh;;
 	sp|stop)
 		command_stop.sh;;
 	r|restart)
 		fn_restart;;
 	uf|update-functions)
-		update_functions.sh;;
+		fn_loadfn update_functions.sh;;
 	m|monitor)
 		command_monitor.sh;;
 	et|email-test)
@@ -172,7 +172,7 @@ exit
 fn_getopt_gmodserver(){
 case "$getopt" in
 	st|start)
-		command_start.sh;;
+		fn_loadfn command_start.sh;;
 	sp|stop)
 		command_stop.sh;;
 	r|restart)
@@ -183,7 +183,7 @@ case "$getopt" in
 		forceupdate=1;
 		update_check.sh;;
 	uf|update-functions)
-		update_functions.sh;;
+		fn_loadfn update_functions.sh;;
 	v|validate)
 		command_validate.sh;;
 	m|monitor)
@@ -236,13 +236,13 @@ exit
 fn_getopt_unreal(){
 case "$getopt" in
 	st|start)
-		command_start.sh;;
+		fn_loadfn command_start.sh;;
 	sp|stop)
 		command_stop.sh;;
 	r|restart)
 		fn_restart;;
 	uf|update-functions)
-		update_functions.sh;;
+		fn_loadfn update_functions.sh;;
 	m|monitor)
 		command_monitor.sh;;
 	et|email-test)
@@ -291,7 +291,7 @@ exit
 fn_getopt_unreal2(){
 case "$getopt" in
 	st|start)
-		command_start.sh;;
+		fn_loadfn command_start.sh;;
 	sp|stop)
 		command_stop.sh;;
 	r|restart)
@@ -302,7 +302,7 @@ case "$getopt" in
 		forceupdate=1;
 		update_check.sh;;
 	uf|update-functions)
-		update_functions.sh;;
+		fn_loadfn update_functions.sh;;
 	v|validate)
 		command_validate.sh;;
 	m|monitor)
@@ -359,13 +359,13 @@ exit
 fn_getopt_ut2k4(){
 case "$getopt" in
 	st|start)
-		command_start.sh;;
+		fn_loadfn command_start.sh;;
 	sp|stop)
 		command_stop.sh;;
 	r|restart)
 		fn_restart;;
 	uf|update-functions)
-		update_functions.sh;;
+		fn_loadfn update_functions.sh;;
 	m|monitor)
 		command_monitor.sh;;
 	et|email-test)

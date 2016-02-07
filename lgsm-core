@@ -90,6 +90,11 @@ if [ ! -f "${filepath}" ]; then
 	if [ ! -d "${filedir}" ]; then
 		mkdir "${filedir}"
 	fi
+	if [ ${filename} = /* ]; then
+		filepath="${filename}"
+	else
+		filepath="${lgsmdir}/${filename}"
+	fi
 	githuburl="https://raw.githubusercontent.com/${githubuser}/${githubrepo}/${githubbranch}/${fileurl}"
 	echo -e "    fetching ${filename}...\c"
 
@@ -117,19 +122,16 @@ if [ ! -f "${filepath}" ]; then
 	else
 		echo -e "\e[0;32mOK\e[0m"
 	fi	
-	if [ "${exec}" ]; then
-		chmod +x "${filepath}"
-	fi
+	chmod +x "${filepath}"
 fi
-if [ "${exec}" ]; then
-	source "${filepath}"
-fi
+source "${filepath}"
 }
 
 # fn_loadfn
 fn_loadfn(){
 	scriptfile=${1:-$functionfile}
 	functionfile=${scriptfile}
+	echo "$functionfile"
 	fn_getgithubfile "functions/${functionfile}" run
 	fn_check_github_files "${lgsmdir}" "${lgsmdir}/functions/${functionfile}"
 }
