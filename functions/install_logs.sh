@@ -11,7 +11,6 @@ if [ "${checklogs}" != "1" ]; then
 fi
 sleep 1
 # Create dir's for the script and console logs
-mkdir -v "${rootdir}/log"
 mkdir -v "${scriptlogdir}"
 touch "${scriptlog}"
 if [ -n "${consolelogdir}" ]; then
@@ -21,8 +20,8 @@ fi
 
 # If a server is source or goldsource, Teamspeak 3, Starbound, Project Zomhoid create a symbolic link to the game server logs.
 if [ "${engine}" == "source" ]||[ "${engine}" == "goldsource" ]||[ "${gamename}" == "Teamspeak 3" ]||[ "${engine}" == "starbound" ]||[ "${engine}" == "projectzomboid" ]; then
-	if [ ! -h "${rootdir}/log/server" ]; then
-		ln -nfsv "${gamelogdir}" "${rootdir}/log/server"
+	if [ ! -h "${logsdir}/server" ]; then
+		ln -nfsv "${gamelogdir}" "${logsdir}/server"
 	fi
 fi
 
@@ -40,8 +39,8 @@ fi
 
 # If server uses SteamCMD create a symbolic link to the Steam logs.
 if [ -d "${rootdir}/Steam/logs" ]; then
-	if [ ! -h "${rootdir}/log/steamcmd" ]; then
-		ln -nfsv "${rootdir}/Steam/logs" "${rootdir}/log/steamcmd"
+	if [ ! -h "${logsdir}/steamcmd" ]; then
+		ln -nfsv "${rootdir}/Steam/logs" "${logsdir}/steamcmd"
 	fi
 fi
 sleep 1
