@@ -121,6 +121,14 @@ functionfile="${FUNCNAME}"
 fn_loadfunction
 }
 
+game_settings.sh(){
+# Functions are defined in core_functions.sh.
+functionfile="${FUNCNAME}"
+fn_loadfunction
+}
+
+game_settings.sh
+
 core_functions.sh
 
 getopt=$1
