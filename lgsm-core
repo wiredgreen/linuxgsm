@@ -62,6 +62,8 @@ settingsdir="${lgsmdir}/settings.tmp"
 gamedatadir="${lgsmdir}/gamedata"
 # Config path for local instances
 scriptcfgdir="${lgsmdir}/cfg/servers"
+# Logs path
+logsdir="${rootdir}/logs"
 # Temporary cache location
 cachedir="${lgsmdir}/tmp"
 
