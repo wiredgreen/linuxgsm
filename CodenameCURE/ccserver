@@ -1,5 +1,5 @@
 #!/bin/bash
-# Quake Live
+# Codename CURE
 # Server Management Script
 # Author: Daniel Gibbs
 # Website: http://gameservermanagers.com
@@ -9,10 +9,9 @@ if [ -f ".dev-debug" ]; then
 	set -x
 fi
 
-version="190216"
+version="271215"
 
 #### Variables ####
-arch="x64"
 
 # Notification Email
 # (on|off)
@@ -24,19 +23,17 @@ steamuser="anonymous"
 steampass=""
 
 # Start Variables
-gameport="27960"
-rconport="28960"
-rconpassword="ch@ng3me"
-statsport="${gameport}"
-statspassword="ch@ng3me"
-mappool='mappool.txt'
+defaultmap="cbe_bunker"
+maxplayers="6"
+port="27015"
+sourcetvport="27020"
+clientport="27005"
 ip="0.0.0.0"
 updateonstart="off"
 
-# Install/Config Guide : https://steamcommunity.com/sharedfiles/filedetails/?id=542966946
-# Console Commands : http://www.regurge.at/ql/
+# https://developer.valvesoftware.com/wiki/Command_Line_Options#Source_Dedicated_Server
 fn_parms(){
-	parms="+set net_strict 1 +set net_ip ${ip} +set net_port ${gameport} +set fs_homepath ${filesdir}/${gameport} +set zmq_rcon_enable 1 +set zmq_rcon_port ${rconport} +set zmq_rcon_password ${rconpassword} +set zmq_stats_enable 1 +set zmq_stats_password ${statspassword} +set zmq_stats_port ${statsport} +set sv_mapPoolFile ${mappool} +exec ${servercfg} "
+parms="-game cure -insecure -strictportbind -ip ${ip} -port ${port} +clientport ${clientport} +tv_port ${sourcetvport} +map ${defaultmap} +servercfgfile ${servercfg} -maxplayers ${maxplayers}"
 }
 
 #### Advanced Variables ####
@@ -49,34 +46,33 @@ githubrepo="linuxgsm"
 githubbranch="master"
 
 # Steam
-appid="349090"
+appid="383410"
 
 # Server Details
-servicename="ql-server"
-gamename="Quake Live"
-engine="idtech3"
+servicename="cc-server"
+gamename="Codename CURE"
+engine="source"
 
 # Directories
 rootdir="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))"
 selfname="$(basename $(readlink -f "${BASH_SOURCE[0]}"))"
 lockselfname=".${servicename}.lock"
 filesdir="${rootdir}/serverfiles"
-systemdir="${filesdir}"
+systemdir="${filesdir}/cure"
 executabledir="${filesdir}"
-executable=$([ "$arch" == 'x64' ] && echo "./run_server_x64.sh" || echo "./run_server_x86.sh")
+executable="./srcds_run"
 servercfg="${servicename}.cfg"
-servercfgdir="${filesdir}/baseq3"
+servercfgdir="${systemdir}/cfg"
 servercfgfullpath="${servercfgdir}/${servercfg}"
 servercfgdefault="${servercfgdir}/lgsm-default.cfg"
 backupdir="${rootdir}/backups"
 
 # Logging
 logdays="7"
-gamelogdir="${rootdir}/log/server"
+gamelogdir="${systemdir}/logs"
 scriptlogdir="${rootdir}/log/script"
 consolelogdir="${rootdir}/log/console"
 
-gamelog="${gamelogdir}/${servicename}-game.log"
 scriptlog="${scriptlogdir}/${servicename}-script.log"
 consolelog="${consolelogdir}/${servicename}-console.log"
 emaillog="${scriptlogdir}/${servicename}-email.log"

@@ -2,7 +2,7 @@
 # LGSM command_details.sh function
 # Author: Daniel Gibbs
 # Website: http://gameservermanagers.com
-lgsm_version="060116"
+lgsm_version="190316"
 
 # Description: Displays server infomation.
 
@@ -306,6 +306,31 @@ fi
 fn_details_statusbottom
 }
 
+fn_details_idtech3(){
+echo -e ""
+echo -e "\e[92mPorts\e[0m"
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' =
+echo -e "Change ports by editing the parameters in"
+echo -e "${servercfgfullpath}."
+echo -e ""
+echo -e "Useful port diagnostic command:"
+echo -e "netstat -atunp | grep qzeroded"
+echo -e ""
+if [ -z "${port}" ]||[ -z "${rconport}" ]||[ -z "${statsport}" ]; then
+	echo -e "\e[0;31mERROR!\e[0m Missing/commented ports in ${servercfg}."
+	echo -e ""
+fi
+{
+	echo -e "DESCRIPTION\tDIRECTION\tPORT\tPROTOCOL"
+	echo -e "> Game\tINBOUND\t${port}\tudp"
+	echo -e "> Rcon\tINBOUND\t${rconport}\tudp"
+	echo -e "> Stats\tINBOUND\t${statsport}\tudp"
+} | column -s $'\t' -t 
+
+fn_details_statusbottom
+}
+
+
 fn_details_seriousengine35(){
 echo -e ""
 echo -e "\e[92mPorts\e[0m"
@@ -603,6 +628,8 @@ elif [ "${engine}" == "dontstarve" ]; then
 		fn_details_dontstarve
 elif [ "${engine}" == "projectzomboid" ]; then
 	fn_details_projectzomboid
+elif [ "${engine}" == "idtech3" ]; then
+	fn_details_idtech3
 elif [ "${engine}" == "realvirtuality" ]; then
 	fn_details_realvirtuality
 elif [ "${engine}" == "seriousengine35" ]; then

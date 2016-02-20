@@ -2,7 +2,7 @@
 # LGSM info_config.sh function
 # Author: Daniel Gibbs
 # Website: http://gameservermanagers.com
-lgsm_version="060116"
+lgsm_version="190216"
 
 # Description: Gets specific details from config files.
 
@@ -153,6 +153,67 @@ elif [ "${engine}" == "projectzomboid" ]; then
 	if [ ! -n "${port}" ]; then
 		port="0"
 	fi
+
+
+# Quake Live
+elif [ "${engine}" == "idtech3" ]; then
+
+	# server name
+	if [ -f "${servercfgfullpath}" ]; then
+		servername=$(grep "set sv_hostname " "${servercfgfullpath}" | sed 's/set sv_hostname //g' | tr -d '=\"; ')
+		if [ ! -n "${servername}" ]; then
+			servername="NOT SET"
+		fi
+	else
+		servername="\e[0;31mUNAVAILABLE\e[0m"
+	fi
+
+	# server password
+	if [ -f "${servercfgfullpath}" ]; then
+
+		serverpassword=$(grep "set g_password" "${servercfgfullpath}" | sed -e 's/set g_password//g' | tr -d '=\"; '| cut -f1 -d "/")
+		if [ ! -n "${serverpassword}" ]; then
+			serverpassword="NOT SET"
+		fi
+	else
+		serverpassword="\e[0;31mUNAVAILABLE\e[0m"
+	fi
+
+	# rcon password
+	rconpassword="${rconpassword}"
+	if [ -f "${servercfgfullpath}" ]; then
+		if [ ! -n "${rconpassword}" ]; then
+			rconpassword="NOT SET"
+		fi
+	else
+		rconpassword="\e[0;31mUNAVAILABLE\e[0m"
+	fi
+
+	# slots
+	if [ -f "${servercfgfullpath}" ]; then
+		slots=$(grep "set sv_maxClients" "${servercfgfullpath}" | grep -v "#" | tr -cd '[:digit:]')
+		if [ ! -n "${slots}" ]; then
+			slots="NOT SET"
+		fi
+	else
+		slots="\e[0;31mUNAVAILABLE\e[0m"
+	fi
+
+	# port
+	port="${gameport}"
+	if [ ! -n "${port}" ]; then
+		port="0"
+	fi
+
+	# rcon port
+	if [ ! -n "${rconport}" ]; then
+		rconport="0"
+	fi
+
+	# Stats port
+	if [ ! -n "${statsport}" ]; then
+		statsport="0"
+	fi	
 
 # ARMA 3
 elif [ "${engine}" == "realvirtuality" ]; then

@@ -2,7 +2,7 @@
 # LGSM update_check.sh function
 # Author: Daniel Gibbs
 # Website: http://gameservermanagers.com
-lgsm_version="020216"
+lgsm_version="060216"
 
 # Description: Checks if a server update is available.
 
@@ -89,6 +89,7 @@ if [ "${requestrestart}" -ge "1" ]; then
 	sleep 1
 	echo -ne "\n"
 	tmuxwc=$(tmux list-sessions 2>&1|awk '{print $1}'|grep -v failed|grep -Ec "^${servicename}:")
+	unset updateonstart
 	if [ "${tmuxwc}" -eq 1 ]; then
 		command_stop.sh
 		update_dl.sh
@@ -156,6 +157,7 @@ if [ "${currentbuild}" != "${availablebuild}" ]; then
 	fn_scriptlog "${currentbuild} > ${availablebuild}"
 
 	tmuxwc=$(tmux list-sessions 2>&1|awk '{print $1}'|grep -v failed|grep -Ec "^${servicename}:")
+	unset updateonstart
 	if [ "${tmuxwc}" -eq 1 ]; then
 		command_stop.sh
 		update_dl.sh
@@ -208,18 +210,24 @@ fi
 currentbuild=$(cat $(find ./* -name 'ts3server*_0.log' 2> /dev/null | sort | egrep -E -v '${rootdir}/.ts3version' | tail -1) | egrep -o 'TeamSpeak 3 Server ((\.)?[0-9]{1,3}){1,3}\.[0-9]{1,3}' | egrep -o '((\.)?[0-9]{1,3}){1,3}\.[0-9]{1,3}')
 
 # Gets the teamspeak server architecture
-ts3arch=$(ls $(find ${filesdir}/ -name 'ts3server_*_*' 2> /dev/null | grep -v 'ts3server_minimal_runscript.sh' | sort | tail -1) | egrep -o '(amd64|x86)' | tail -1)
-
+info_distro.sh
+if [ "${arch}" == "x86_64" ]; then
+	ts3arch="amd64"
+elif [ "${arch}" == "i386" ]||[ "${arch}" == "i686" ]; then
+	ts3arch="x86"
+else
+	echo ""
+	fn_printfailure "${arch} is an unsupported architecture"
+	exit 1
+fi
+ 
 # Gets availablebuild info
 
 # Grabs all version numbers but not in correct order
 wget "http://dl.4players.de/ts/releases/?C=M;O=D" -q -O -| grep -i dir | egrep -o '<a href=\".*\/\">.*\/<\/a>' | egrep -o '[0-9\.?]+'|uniq > .ts3_version_numbers_unsorted.tmp
 
-# Replaces dots with spaces to split up the number. e.g 3 0 12 1 is 3.0.12.1 this allows correct sorting
- cat .ts3_version_numbers_unsorted.tmp | tr "." " " > .ts3_version_numbers_digit.tmp
-# Sorts versions in to correct order
-# merges 2 files and orders by each column in order allowing these version numbers to be sorted in order
-paste .ts3_version_numbers_digit.tmp .ts3_version_numbers_unsorted.tmp | awk '{print $1,$2,$3,$4 " " $0;}'| sort  -k1rn -k2rn -k3rn -k4rn | awk '{print $NF}' > .ts3_version_numbers.tmp
+# Sort version numbers
+cat .ts3_version_numbers_unsorted.tmp | sort -r --version-sort -o .ts3_version_numbers_sorted.tmp
 
 # Finds directory with most recent server version.
 while read ts3_version_number; do
@@ -229,12 +237,11 @@ while read ts3_version_number; do
 		# Break while-loop, if the latest release could be found
 		break
 	fi
-done < .ts3_version_numbers.tmp
+done < .ts3_version_numbers_sorted.tmp
 
-# tidy up
-rm -f ".ts3_version_numbers_digit.tmp"
+# Tidy up
 rm -f ".ts3_version_numbers_unsorted.tmp"
-rm -f ".ts3_version_numbers.tmp"
+rm -f ".ts3_version_numbers_sorted.tmp"
 
 # Checks availablebuild info is available
 if [ -z "${availablebuild}" ]; then
@@ -274,6 +281,7 @@ if [ "${currentbuilddigit}" -ne "${availablebuilddigit}" ]; then
 	fn_scriptlog "Current build: ${currentbuild}"
 	fn_scriptlog "Available build: ${availablebuild}"
 	fn_scriptlog "${currentbuild} > ${availablebuild}"
+	unset updateonstart
 	info_ts3status.sh
 	if [ "${ts3status}" = "No server running (ts3server.pid is missing)" ]; then
 		update_dl.sh
