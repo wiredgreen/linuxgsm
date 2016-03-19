@@ -29,7 +29,7 @@ githubbranch="development"
 rootdir="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))"
 selfname="$(basename $(readlink -f "${BASH_SOURCE[0]}"))"
 lgsmdir="${rootdir}/lgsm"
-lgsmconf="${lgsmdir}/lgsm.cfg"
+lgsmconf="${lgsmdir}/${selfname}.cfg"
 functionsdir="${lgsmdir}/functions"
 
 ##### Script #####
@@ -90,6 +90,12 @@ functionfile="${FUNCNAME}"
 fn_fetch_core_dl
 }
 
+fn_lgsm_config(){
+if [ ! -f "${rootdir}/${selfname}.cfg"]; then
+echo "Downloading configuration file..."
+curl -s --fail -o "https://raw.githubusercontent.com/${githubuser}/${githubrepo}/${githubbranch}/config/lgsm.cfg" "${selfname}.cfg" 2>&1
+fi
+}
 core_dl.sh
 core_functions.sh
 
