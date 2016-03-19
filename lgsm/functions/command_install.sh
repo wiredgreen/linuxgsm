@@ -10,10 +10,6 @@ local modulename="Install"
 function_selfname="$(basename $(readlink -f "${BASH_SOURCE[0]}"))"
 
 check.sh
-install_header.sh
-install_server_dir.sh
-install_logs.sh
-check_deps.sh 
 
 fn_select_server_install(){
 if [ -z "${gamename}" ] && [ "${lgsm_unified}" == "1" ] ; then
@@ -37,6 +33,10 @@ fi
 }
 
 fn_select_server_install
+install_header.sh
+install_server_dir.sh
+install_logs.sh
+check_deps.sh 
 
 # Download and install
 if [ "${gamename}" == "Unreal Tournament 2004" ]; then
