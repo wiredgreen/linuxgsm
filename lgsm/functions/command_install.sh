@@ -31,6 +31,9 @@ if [ -f "${lgsmdir}/${serverchoice}-${selfname}.cfg" ]; then
 	serverconfig="${lgsmdir}/${serverchoice}-${selfname}.cfg"
 	chmod +x "${serverconfig}"
 	source ${serverconfig}
+else
+	fn_printerror "Server configuration file couldn't be downloaded"
+	exit 1
 fi
 }
 
