@@ -111,16 +111,16 @@ if [ -f "${serverselectionfile}" ]; then
 	# Seek server seleciton variable
 	if [ -n "${serverchoice}" ]; then
 		# Search corresponding config file and exec
-		if [ -f "${lgsmdir}/{serverchoice}-${selfname}.cfg" ]; then
+		if [ -f "${lgsmdir}/${serverchoice}-${selfname}.cfg" ]; then
 			# Make it a variable and exec
-			serverconfig="${lgsmdir}/{serverchoice}-${selfname}.cfg"
+			serverconfig="${lgsmdir}/${serverchoice}-${selfname}.cfg"
 			chmod +x "${serverconfig}"
 			source "${serverconfig}"
 		else
-        echo "Please, choose a server in ${serverselectionfile}, something like serverchoice=\"gameserver\""
+        echo "Server selection file error."
 		fi
 	else
-		echo "No server installed yet"
+		echo "No server installed yet."
 	fi
 fi
 }
