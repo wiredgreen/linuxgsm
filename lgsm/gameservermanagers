@@ -100,13 +100,8 @@ if [ ! -f "${lgsmconf}" ]; then
 fi
 if [ -f "${lgsmconf}" ]; then
 	source ${lgsmconf}
-fi
-if [ -f "${lgsmdir}/${serverchoice}-${selfname}.cfg" ]; then
-	serverconfig="${lgsmdir}/${serverchoice}-${selfname}.cfg"
-	chmod +x "${serverconfig}"
-	source ${serverconfig}
 else
-	fn_printerrornl "Server configuration file couldn't be downloaded"
+	echo "Error! Server configuration not found"
 	exit 1
 fi
 }
