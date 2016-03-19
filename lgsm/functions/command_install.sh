@@ -33,6 +33,7 @@ if [ -z "${gamename}" ] && [ -z "${engine}" ] && [ -z "${appid}" ] && [ "${lgsm_
 	else
 		echo "Server configuration file couldn't be downloaded"
 		exit 1
+	fi
 fi
 }
 
