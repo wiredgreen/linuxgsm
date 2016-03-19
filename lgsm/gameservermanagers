@@ -32,6 +32,9 @@ selfname="$(basename $(readlink -f "${BASH_SOURCE[0]}"))"
 lgsmdir="${rootdir}/lgsm"
 functionsdir="${lgsmdir}/functions"
 
+# Service name
+servicename="${selfname}"
+
 ##### Script #####
 # Do not edit
 
@@ -116,6 +119,8 @@ if [ -f "${serverselectionfile}" ]; then
 			serverconfig="${lgsmdir}/${serverchoice}-${selfname}.cfg"
 			chmod +x "${serverconfig}"
 			source "${serverconfig}"
+			# Service name
+			servicename="${serverchoice}-${selfname}"
 		else
         echo "Server selection file error."
 		fi
