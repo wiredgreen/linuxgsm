@@ -92,13 +92,15 @@ fn_fetch_core_dl
 
 fn_lgsm_config(){
 if [ ! -f "${rootdir}/${selfname}.cfg"]; then
-echo "Downloading configuration file..."
-wget --no-cache "https://raw.githubusercontent.com/${githubuser}/${githubrepo}/${githubbranch}/config/lgsm.cfg" -O "${lgsmconf}" 2>&1
-chmod +x "${lgsmconf}"
+	echo "Downloading configuration file..."
+	wget --no-cache "https://raw.githubusercontent.com/${githubuser}/${githubrepo}/${githubbranch}/config/lgsm.cfg" -O "${lgsmconf}" 2>&1
+	chmod +x "${lgsmconf}"
 fi
 if [ -f "${lgsmconf}" ]; then
-${lgsmconf}
+	${lgsmconf}
+fi
 }
+
 core_dl.sh
 core_functions.sh
 fn_lgsm_config
