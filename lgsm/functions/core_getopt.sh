@@ -6,6 +6,32 @@ lgsm_version="070116"
 
 # Description: getopt arguments.
 
+fn_getopt_newserver(){
+case "$getopt" in
+	uf|update-functions)
+		command_update_functions.sh;;
+	et|email-test)
+		command_email_test.sh;;
+	dev|dev-debug)
+		command_dev_debug.sh;;
+	i|install)
+		command_install.sh;;
+	dd|depsdetect)
+		command_dev_detect_deps.sh;;
+	*)
+	echo "Usage: $0 [option]"
+	echo "${gamename} - Linux Game Server Manager - Version ${version}"
+	echo "http://gameservermanagers.com/${selfname}"
+	echo -e ""
+	echo -e "\e[93mCommands\e[0m"
+	{
+		echo -e "\e[34minstall\t\e[0mInstall a server."
+		echo -e "\e[34mupdate-functions\t\e[0mRemoves all functions so latest can be downloaded."
+	} | column -s $'\t' -t 
+	esac
+exit
+}
+
 fn_getopt_generic(){
 case "$getopt" in
 	st|start)
@@ -436,6 +462,8 @@ elif [ "${engine}" == "unreal2" ]; then
 	fi
 elif [ "${engine}" == "unreal" ]; then
 	fn_getopt_unreal
+elif [ -z "${gamename}" ] && [ "${lgsm_unified}" == "1" ] ; then
+	fn_getopt_newserver
 else
 	fn_getopt_generic
 fi

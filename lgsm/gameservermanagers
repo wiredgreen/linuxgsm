@@ -13,6 +13,7 @@ if [ -f ".dev-debug" ]; then
 fi
 
 lgsm_version="190316"
+lgsm_unified="1"
 
 #### Github Configuration ####
 
@@ -29,7 +30,6 @@ githubbranch="lgsm-installer"
 rootdir="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))"
 selfname="$(basename $(readlink -f "${BASH_SOURCE[0]}"))"
 lgsmdir="${rootdir}/lgsm"
-lgsmconf="${lgsmdir}/${selfname}.cfg"
 functionsdir="${lgsmdir}/functions"
 
 ##### Script #####
@@ -91,13 +91,22 @@ fn_fetch_core_dl
 }
 
 fn_lgsm_config(){
-if [ ! -f "${rootdir}/${selfname}.cfg" ]; then
+# Detect config, download if needed
+lgsmconf="${lgsmdir}/${selfname}.cfg"
+if [ ! -f "${lgsmconf}" ]; then
 	echo "Downloading configuration file..."
 	wget --no-cache "https://raw.githubusercontent.com/${githubuser}/${githubrepo}/${githubbranch}/lgsm/config/lgsm.cfg" -O "${lgsmconf}" 2>&1
 	chmod +x "${lgsmconf}"
 fi
 if [ -f "${lgsmconf}" ]; then
 	${lgsmconf}
+fi
+if [ -f "${lgsmdir}/${serverchoice}-${selfname}.cfg" ]; then
+	serverconfig="${lgsmdir}/${serverchoice}-${selfname}.cfg"
+	chmod +x "${serverconfig}"
+	${serverconfig}
+else 
+	fn_printwarnnl "No server installed."
 fi
 }
 

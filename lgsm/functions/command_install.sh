@@ -14,6 +14,30 @@ install_header.sh
 install_server_dir.sh
 install_logs.sh
 check_deps.sh 
+
+fn_select_server_install(){
+if [ -z "${gamename}" ] && [ "${lgsm_unified}" == "1" ] ; then
+	echo "Available games:" 
+	array=('sourcegames=(cssserver csgoserver gmodserver)' 'othergames=(test test2)'); 
+	for elt in "${array[@]}";do eval $elt; done;
+	echo "Source Games : ${sourcegames[@]}"
+	echo "Other Games : ${othergames[@]}"
+fi
+echo "Enter game name:"
+read serverchoice
+# Detect config, download if needed
+if [ ! -f "${lgsmdir}/${serverchoice}-${selfname}.cfg" ]; then
+	echo "Downloading configuration file..."
+	wget --no-cache "https://raw.githubusercontent.com/${githubuser}/${githubrepo}/${githubbranch}/lgsm/games/${serverchoice}.cfg" -O "${serverchoice}-${selfname}.cfg" 2>&1
+	chmod +x "${lgsmconf}"
+fi
+if [ -f "${lgsmconf}" ]; then
+	${lgsmconf}
+fi
+}
+
+fn_select_server_install
+
 # Download and install
 if [ "${gamename}" == "Unreal Tournament 2004" ]; then
 	install_server_files.sh
