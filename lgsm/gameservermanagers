@@ -115,14 +115,14 @@ if [ -f "${serverselectionfile}" ]; then
 			# Make it a variable and exec
 			serverconfig="${lgsmdir}/{serverchoice}-${selfname}.cfg"
 			chmod +x "${serverconfig}"
-			source ${serverconfig}
+			source "${serverconfig}"
 		else
         echo "Please, choose a server in ${serverselectionfile}, something like serverchoice=\"gameserver\""
+		fi
 	else
 		echo "No server installed yet"
 	fi
 fi
-
 }
 
 core_dl.sh
