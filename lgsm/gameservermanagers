@@ -98,12 +98,31 @@ if [ ! -f "${lgsmconf}" ]; then
 	wget --no-cache "https://raw.githubusercontent.com/${githubuser}/${githubrepo}/${githubbranch}/lgsm/config/lgsm.cfg" -O "${lgsmconf}" 2>&1
 	chmod +x "${lgsmconf}"
 fi
+# If config found, execute
 if [ -f "${lgsmconf}" ]; then
-	source ${lgsmconf}
+	source "${lgsmconf}"
 else
 	echo "Error! Server configuration not found"
 	exit 1
 fi
+# Seek server selection file and exec 
+if [ -f "${serverselectionfile}" ]; then
+	source "${serverselectionfile}"
+	# Seek server seleciton variable
+	if [ -n "${serverchoice}" ]; then
+		# Search corresponding config file and exec
+		if [ -f "${lgsmdir}/{serverchoice}-${selfname}.cfg" ]; then
+			# Make it a variable and exec
+			serverconfig="${lgsmdir}/{serverchoice}-${selfname}.cfg"
+			chmod +x "${serverconfig}"
+			source ${serverconfig}
+		else
+        echo "Please, choose a server in ${serverselectionfile}, something like serverchoice=\"gameserver\""
+	else
+		echo "No server installed yet"
+	fi
+fi
+
 }
 
 core_dl.sh

@@ -34,6 +34,8 @@ if [ -z "${gamename}" ] && [ -z "${engine}" ] && [ -z "${appid}" ] && [ "${lgsm_
 		echo "Server configuration file couldn't be downloaded"
 		exit 1
 	fi
+	touch "${serverselectionfile}"
+	echo serverchoice="${serverchoice}" > "${serverselectionfile}"
 fi
 }
 
