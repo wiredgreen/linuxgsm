@@ -12,7 +12,7 @@ function_selfname="$(basename $(readlink -f "${BASH_SOURCE[0]}"))"
 check.sh
 
 fn_select_server_install(){
-if [ -z "${gamename}" ] && [ -z "${engine}" ] && [ -z "${appid}" [ "${lgsm_unified}" == "1" ] ; then
+if [ -z "${gamename}" ] && [ -z "${engine}" ] && [ -z "${appid}" ] && [ "${lgsm_unified}" == "1" ] ; then
 	echo "Available games:" 
 	array=('sourcegames=(cssserver csgoserver gmodserver)' 'othergames=(test test2)'); 
 	for elt in "${array[@]}";do eval $elt; done;
@@ -26,14 +26,13 @@ if [ -z "${gamename}" ] && [ -z "${engine}" ] && [ -z "${appid}" [ "${lgsm_unifi
 		wget --no-cache "https://raw.githubusercontent.com/${githubuser}/${githubrepo}/${githubbranch}/lgsm/games/${serverchoice}.cfg" -O "${lgsmdir}/${serverchoice}-${selfname}.cfg" 2>&1
 		chmod +x "${serverconfig}"
 	fi
-fi
-if [ -f "${lgsmdir}/${serverchoice}-${selfname}.cfg" ]; then
-	serverconfig="${lgsmdir}/${serverchoice}-${selfname}.cfg"
-	chmod +x "${serverconfig}"
-	source ${serverconfig}
-else
-	fn_printerrornl "Server configuration file couldn't be downloaded"
-	exit 1
+	if [ -f "${lgsmdir}/${serverchoice}-${selfname}.cfg" ]; then
+		serverconfig="${lgsmdir}/${serverchoice}-${selfname}.cfg"
+		chmod +x "${serverconfig}"
+		source ${serverconfig}
+	else
+		echo "Server configuration file couldn't be downloaded"
+		exit 1
 fi
 }
 
