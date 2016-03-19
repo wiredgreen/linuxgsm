@@ -21,7 +21,7 @@ lgsm_version="190316"
 # from a different repo and/or branch.
 githubuser="dgibbs64"
 githubrepo="linuxgsm"
-githubbranch="development"
+githubbranch="lgsm-installer"
 
 #### Variables ####
 
@@ -93,8 +93,9 @@ fn_fetch_core_dl
 fn_lgsm_config(){
 if [ ! -f "${rootdir}/${selfname}.cfg"]; then
 echo "Downloading configuration file..."
-curl -s --fail -o "https://raw.githubusercontent.com/${githubuser}/${githubrepo}/${githubbranch}/config/lgsm.cfg" "${selfname}.cfg" 2>&1
+curl -s --fail -o "https://raw.githubusercontent.com/${githubuser}/${githubrepo}/${githubbranch}/config/lgsm.cfg" "${lgsmconf}" 2>&1
 fi
+${lgsmconf}
 }
 core_dl.sh
 core_functions.sh
