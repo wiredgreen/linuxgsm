@@ -27,8 +27,10 @@ if [ ! -f "${lgsmdir}/${serverchoice}-${selfname}.cfg" ]; then
 	wget --no-cache "https://raw.githubusercontent.com/${githubuser}/${githubrepo}/${githubbranch}/lgsm/games/${serverchoice}.cfg" -O "${lgsmdir}/${serverchoice}-${selfname}.cfg" 2>&1
 	chmod +x "${lgsmconf}"
 fi
-if [ -f "${lgsmconf}" ]; then
-	${lgsmconf}
+if [ -f "${lgsmdir}/${serverchoice}-${selfname}.cfg" ]; then
+	serverconfig="${lgsmdir}/${serverchoice}-${selfname}.cfg"
+	chmod +x "${serverconfig}"
+	${serverconfig}
 fi
 }
 

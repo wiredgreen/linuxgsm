@@ -105,8 +105,6 @@ if [ -f "${lgsmdir}/${serverchoice}-${selfname}.cfg" ]; then
 	serverconfig="${lgsmdir}/${serverchoice}-${selfname}.cfg"
 	chmod +x "${serverconfig}"
 	${serverconfig}
-else 
-	echo "No server installed."
 fi
 }
 
