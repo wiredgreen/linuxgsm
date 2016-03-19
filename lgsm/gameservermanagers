@@ -104,7 +104,7 @@ fi
 if [ -f "${lgsmdir}/${serverchoice}-${selfname}.cfg" ]; then
 	serverconfig="${lgsmdir}/${serverchoice}-${selfname}.cfg"
 	chmod +x "${serverconfig}"
-	${serverconfig}
+	sh ${serverconfig}
 fi
 }
 

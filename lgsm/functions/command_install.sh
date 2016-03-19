@@ -25,12 +25,12 @@ read serverchoice
 if [ ! -f "${lgsmdir}/${serverchoice}-${selfname}.cfg" ]; then
 	echo "Downloading configuration file..."
 	wget --no-cache "https://raw.githubusercontent.com/${githubuser}/${githubrepo}/${githubbranch}/lgsm/games/${serverchoice}.cfg" -O "${lgsmdir}/${serverchoice}-${selfname}.cfg" 2>&1
-	chmod +x "${lgsmconf}"
+	chmod +x "${serverconfig}"
 fi
 if [ -f "${lgsmdir}/${serverchoice}-${selfname}.cfg" ]; then
 	serverconfig="${lgsmdir}/${serverchoice}-${selfname}.cfg"
 	chmod +x "${serverconfig}"
-	${serverconfig}
+	sh ${serverconfig}
 fi
 }
 
