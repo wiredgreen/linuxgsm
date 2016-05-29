@@ -19,9 +19,9 @@ if [ -z "${autoinstall}" ]; then
 	sleep 1
 	read -p "Enter server name: " servername
 	read -p "Enter rcon password: " rconpass
-else
-	servername="${servicename}"
-	rconpass="rconpassword"
+# else
+	# servername="${servicename}"
+	# rconpass="rconpassword"
 fi
 echo "changing hostname."
 sed -i "s/\"<hostname>\"/\"${servername}\"/g" "${servercfgfullpath}"
