@@ -2,21 +2,31 @@
 # Counter Strike: Global Offensive
 # Server Management Script
 # Author: Daniel Gibbs
-# Website: http://gameservermanagers.com
+# Website: https://gameservermanagers.com
 if [ -f ".dev-debug" ]; then
 	exec 5>dev-debug.log
 	BASH_XTRACEFD="5"
 	set -x
 fi
 
-version="271215"
+version="210516"
 
 #### Variables ####
 
-# Notification Email
+# Notification Alerts
 # (on|off)
-emailnotification="off"
+
+# Email
+emailalert="off"
 email="email@example.com"
+
+# Pushbullet
+# https://www.pushbullet.com/#settings
+pushbulletalert="off"
+pushbullettoken="accesstoken"
+
+# Auto install
+autoinstall="on"
 
 # Steam login
 steamuser="anonymous"
@@ -35,7 +45,7 @@ gametype="0"
 defaultmap="de_dust2"
 mapgroup="random_classic"
 maxplayers="16"
-tickrate="64"
+tickrate="128"
 port="27015"
 sourcetvport="27020"
 clientport="27005"
@@ -44,8 +54,8 @@ updateonstart="off"
 
 # Required: Game Server Login Token
 # GSLT is required for running a public server.
-# More info: http://gameservermanagers.com/gslt
-gslt=""
+# More info: https://gameservermanagers.com/gslt
+gslt="5313C313A388060D2C2817F24B4EDD1F"
 
 # Optional: Workshop Parameters
 # https://developer.valvesoftware.com/wiki/CSGO_Workshop_For_Server_Operators
@@ -64,7 +74,7 @@ parms="-game csgo -usercon -strictportbind -ip ${ip} -port ${port} +clientport $
 # Github Branch Select
 # Allows for the use of different function files
 # from a different repo and/or branch.
-githubuser="dgibbs64"
+githubuser="wiredgreen"
 githubrepo="linuxgsm"
 githubbranch="master"
 
@@ -73,6 +83,8 @@ appid="740"
 
 # Server Details
 servicename="csgo-server"
+servername="Counter Strike: GO Server"
+rconpass="password"
 gamename="Counter Strike: Global Offensive"
 engine="source"
 
@@ -95,6 +107,7 @@ logdays="7"
 gamelogdir="${systemdir}/logs"
 scriptlogdir="${rootdir}/log/script"
 consolelogdir="${rootdir}/log/console"
+consolelogging="on"
 
 scriptlog="${scriptlogdir}/${servicename}-script.log"
 consolelog="${consolelogdir}/${servicename}-console.log"
@@ -121,7 +134,7 @@ if [ ! -f "${filepath}" ]; then
 	echo -e "    fetching ${filename}...\c"
 	if [ "$(command -v curl)" ]||[ "$(which curl >/dev/null 2>&1)" ]||[ -f "/usr/bin/curl" ]||[ -f "/bin/curl" ]; then
 		:
-	else	
+	else
 		echo -e "\e[0;31mFAIL\e[0m\n"
 		echo "Curl is not installed!"
 		echo -e ""
@@ -135,7 +148,7 @@ if [ ! -f "${filepath}" ]; then
 		exit
 	else
 		echo -e "\e[0;32mOK\e[0m"
-	fi	
+	fi
 	if [ "${exec}" ]; then
 		chmod +x "${filepath}"
 	fi
