@@ -19,6 +19,9 @@ version="230215"
 emailnotification="off"
 email="email@example.com"
 
+# Auto install
+autoinstall="on"
+
 # Steam login (not required)
 steamuser="anonymous"
 steampass=""
@@ -59,7 +62,7 @@ fi
 # Allows for the use of different function files
 # from a different repo and/or branch.
 githubuser="dgibbs64"
-githubrepo="linuxgsm"
+githubrepo="wiredgreen"
 githubbranch="master"
 
 # Steam
